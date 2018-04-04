@@ -16,40 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var mainRouteCoordinator : RouterCoordinator?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        self.makeDepencyGraph()
+        makeDepencyTree()
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = mainRouteCoordinator?.rootViewController
         window?.makeKeyAndVisible()
         return true
     }
 
-    func makeDepencyGraph(){
-        let container = Container()
-        
-        container.register(WebServiceLayer.self) { r in
-            WebServiceLayer()
-            }.inObjectScope(.container)
-        
-        container.register(ViewModelProvider.self) { r in
-            ViewModelProvider(network: r.resolve(WebServiceLayer.self)!)
-            }.inObjectScope(.transient)
-        
-        container.register(DetailRecipeViewModelProvider.self) { r in
-            DetailRecipeViewModelProvider()
-            }.inObjectScope(.transient)
-        
-        container.register(DetailRouterCoordinatorProvider.self) { r in
-            DetailRouterCoordinatorProvider(detailRecipeViewModelProvider: r.resolve(DetailRecipeViewModelProvider.self)!)
-            }.inObjectScope(.transient)
-        
-        container.register(RouterCoordinator.self) {r in
-            RouterCoordinator(network: r.resolve(WebServiceLayer.self)!,
-                              viewModelProvider: r.resolve(ViewModelProvider.self)!,
-                              detailRecipeCoordinatorProvider: r.resolve(DetailRouterCoordinatorProvider.self)!)
-            }.inObjectScope(.transient)
-
-        mainRouteCoordinator = container.resolve(RouterCoordinator.self)!
-    }
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -75,3 +48,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+extension AppDelegate{
+    func makeDepencyTree(){
+        let container = Container()
+        
+        container.register(WebServiceLayer.self) { r in
+            WebServiceLayer()
+            }.inObjectScope(.container)
+        
+        container.register(ViewModelProvider.self) { r in
+            ViewModelProvider(network: r.resolve(WebServiceLayer.self)!)
+            }.inObjectScope(.transient)
+        
+        container.register(DetailRecipeViewModelProvider.self) { r in
+            DetailRecipeViewModelProvider()
+            }.inObjectScope(.transient)
+        
+        container.register(DetailRouterCoordinatorProvider.self) { r in
+            DetailRouterCoordinatorProvider(detailRecipeViewModelProvider: r.resolve(DetailRecipeViewModelProvider.self)!)
+            }.inObjectScope(.transient)
+        
+        container.register(RouterCoordinator.self) {r in
+            RouterCoordinator(network: r.resolve(WebServiceLayer.self)!,
+                              viewModelProvider: r.resolve(ViewModelProvider.self)!,
+                              detailRecipeCoordinatorProvider: r.resolve(DetailRouterCoordinatorProvider.self)!)
+            }.inObjectScope(.transient)
+        
+        mainRouteCoordinator = container.resolve(RouterCoordinator.self)!
+    }
+}

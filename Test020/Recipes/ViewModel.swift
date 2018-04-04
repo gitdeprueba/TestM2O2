@@ -21,20 +21,18 @@ class ViewModel {
     }
 
     func retrieveRecipes(nameRecipe: String) {
-        cellsViewModel = []
         
         network.retrieveRecipe(recipeName: nameRecipe, { (recipes) in
-            if recipes?.results.count == 0{
-                self.delegate?.recipeListDidUpdateDelegate(self)
-                
-            }else{
+            self.cellsViewModel = []
+            
+            if recipes?.results.count != 0{
                 self.recipes = recipes
                 for recipeResult in (recipes?.results)! {
                     let viewModel = RecipeCellViewModel(recipeResult: recipeResult)
                     self.cellsViewModel.append(viewModel)
                 }
-                self.delegate?.recipeListDidUpdateDelegate(self)
             }
+            self.delegate?.recipeListDidUpdateDelegate(self)
         }) { (error) in
             self.delegate?.recipeListDidUpdateDelegate(self)
             print("ERROR RETRIEVING RECIPES")

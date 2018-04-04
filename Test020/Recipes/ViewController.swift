@@ -47,8 +47,8 @@ class ViewController: UIViewController, ViewModelDelegate {
     func recipeListDidUpdateDelegate(_: ViewModel) {
         DispatchQueue.main.async {
             self.activityIndicator.stopAnimating()
+            self.tableView.reloadData()
         }
-        self.tableView.reloadData()
     }
     
     required init?(coder aDecoder: NSCoder) {
